@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import ConsoleAppender from '../../../src/appenders/console';
 import { SIMPLE_LOG_FORMAT } from '../../../src/date-formatter';
 import LogLevel from '../../../src/log-level';
-import { getLogger, listenToWindowErrors } from '../../../src/index';
+import { getLogger } from '../../../src/index';
 import LogEvent from '../../../src/log-event';
 import SimpleLayout from '../../../src/layouts/simple';
 import { assert, sandbox as Sandbox } from 'sinon';
