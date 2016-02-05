@@ -2,3 +2,4 @@ node_modules/
 jspm_packages
 lib
 server.js
+npm-debug.log

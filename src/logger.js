@@ -4,6 +4,10 @@ import Appender from './appender';
 import Level from './log-level';
 import LogEvent from './log-event';
 
+// Helper methods that should can be called to log on a specific level. Each
+// level can be used as a method like logger.trace(...) or logger.warn(...)
+const loggingMethods = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'];
+
 class Logger {
   // Creates a new Logger with a category
   // 'category' should be the category as a string
@@ -11,6 +15,10 @@ class Logger {
     this.category = category || '';
     this.appenders = [];
     this.level = Level.ALL;
+
+    // Bind logging methods to ease use when passing functions around, e.g.
+    // array.forEach(logger.debug);
+    loggingMethods.forEach(levelStr => this[levelStr] = this[levelStr].bind(this));
   }
 
   // Adds an appender to this logger without touching current appenders
@@ -73,12 +81,9 @@ class Logger {
   }
 }
 
-// Helper methods that should can be called to log on a specific level. Each
-// level can be used as a method like logger.trace(...) or logger.warn(...)
-['trace', 'debug', 'info', 'warn', 'error', 'fatal'].forEach(levelStr => {
-  Logger.prototype[levelStr] = function log(message, throwable) {
-    this.logIfEnabled(Level.toLevel(levelStr), message, throwable);
-  };
+// Set helper function prototypes
+loggingMethods.forEach(levelStr => Logger.prototype[levelStr] = function log(message, throwable) {
+  this.logIfEnabled(Level.toLevel(levelStr), message, throwable);
 });
 
 export default Logger;
