@@ -39,10 +39,10 @@ export function getLogger(category) {
 // 'logger' has to be an initialized Logger object
 export function listenToWindowErrors(logger) {
   try {
-    window.addEventListener('error', (msg, url, line) => {
-      const message = `Error in (${url || window.location}) on line ${line}` +
-        ` with message (${msg})`;
-      logger.fatal(message);
+    window.addEventListener('error', (errorEvent) => {
+      const message = `Error in (${window.location}) on line ${errorEvent.lineno}:${errorEvent.colno}` +
+        ` with message:\n${errorEvent.message}`;
+      logger.fatal(message, errorEvent.error);
     });
   } catch (exception) {
     // An error inside the logger has occured, the only way to safely
