@@ -1,13 +1,11 @@
 export default class LogEvent {
   // 'categoryName' is of the type 'string'
   // 'level' is of the type 'Level'
-  // 'message' is of the type 'string'
-  // 'exception' can be any object
-  constructor(categoryName, level, message, exception) {
+  // 'args' is an array or a single argument
+  constructor(categoryName, level, args) {
     this.categoryName = categoryName;
     this.level = level;
-    this.message = message;
-    this.exception = exception;
+    this.args = args;
 
     this.timestamp = new Date();
   }

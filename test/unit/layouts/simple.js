@@ -20,16 +20,28 @@ describe('SimpleLayout', () => {
   });
 
   it('structure', () => {
-    const logger = getLogger('test');
     const layout = new SimpleLayout();
     const error = new Error('exception');
     const message = layout.format(
-      new LogEvent('test', LogLevel.DEBUG, 'message', error, logger));
+      new LogEvent('test', LogLevel.DEBUG, ['message', error]));
 
     const messageDate = message.substring(0, SIMPLE_LOG_FORMAT.length);
     const messageRest = message.substring(SIMPLE_LOG_FORMAT.length);
 
     expect(messageDate).to.match(simpleLogDateRegex);
-    expect(messageRest).to.equal(` - DEBUG - test - message\n${error.stack}\n`);
+
+    const cache = [];
+    const errorRepresentation = JSON.stringify(error, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.indexOf(value) !== -1) {
+          // Circular reference found, discard key
+          return undefined;
+        }
+        // Store value in our collection
+        cache.push(value);
+      }
+      return value;
+    });
+    expect(messageRest).to.equal(` - DEBUG - test - message\n${errorRepresentation}\n`);
   });
 });

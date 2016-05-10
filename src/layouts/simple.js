@@ -1,6 +1,21 @@
 import { formatDate, SIMPLE_LOG_FORMAT } from '../date-formatter';
 import Layout from '../layout';
 
+function safeStringify(obj) {
+  const cache = [];
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Circular reference found, discard key
+        return undefined;
+      }
+      // Store value in our collection
+      cache.push(value);
+    }
+    return value;
+  });
+}
+
 // Simple string layout for a logging event which styles a log event
 // in the following format:
 //
@@ -15,9 +30,24 @@ export default class SimpleLayout extends Layout {
   }
 
   format(loggingEvent) {
-    return `${formatDate(loggingEvent.timestamp, SIMPLE_LOG_FORMAT)} - ${loggingEvent.level.toString()}` +
-      ` - ${loggingEvent.categoryName} - ${loggingEvent.message}` +
-      `${loggingEvent.exception ? this.LINE_SEP + loggingEvent.exception.stack : ''}` + this.getSeparator();
+    let result = `${formatDate(loggingEvent.timestamp, SIMPLE_LOG_FORMAT)} - ${loggingEvent.level.toString()}` +
+      ` - ${loggingEvent.categoryName} - `;
+    if (Array.isArray(loggingEvent.args)) {
+      for (const argument of loggingEvent.args) {
+        let argumentString = argument;
+        if (typeof argument === 'object') {
+          argumentString = safeStringify(argument);
+        }
+        result = result + `${argumentString}` + this.LINE_SEP;
+      }
+    } else if (loggingEvent.args) {
+      let argumentString = loggingEvent.args;
+      if (typeof loggingEvent.args === 'object') {
+        argumentString = safeStringify(loggingEvent.args);
+      }
+      result = result + `${argumentString}` + this.LINE_SEP;
+    }
+    return result;
   }
 
   getContentType() {

@@ -3,30 +3,30 @@
 
 import Appender from '../appender';
 import LogLevel from '../log-level';
-import SimpleLayout from '../layouts/simple';
+import ArrayLayout from '../layouts/array';
 
 // Appender that writes log messages to the console
 export default class ConsoleAppender extends Appender {
   constructor() {
     super();
 
-    this.layout = new SimpleLayout();
+    this.layout = new ArrayLayout();
   }
 
   doAppend(loggingEvent) {
     // Format the logging event into a printable string
-    const logMessage = this.layout.format(loggingEvent);
+    const messages = this.layout.format(loggingEvent);
 
     // Call the appropriate console log method if it exists
     if (loggingEvent.level === LogLevel.WARN && console.warn) {
-      console.warn(logMessage);
+      console.warn(...messages);
     } else if (loggingEvent.level === LogLevel.INFO && console.info) {
-      console.info(logMessage);
+      console.info(...messages);
     } else if (loggingEvent.level.valueOf() >= LogLevel.ERROR.valueOf() && console.error) {
       // Everything that is above the ERROR level (e.g. FATAL) should be logged via console.error()
-      console.error(logMessage);
+      console.error(...messages);
     } else {
-      console.log(logMessage);
+      console.log(...messages);
     }
   }
 

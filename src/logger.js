@@ -56,10 +56,9 @@ class Logger {
   // instead.
   // 'logLevel' is of the type 'Level'
   // 'message' is of the type 'string'
-  // 'exception' can be any object
-  log(logLevel, message, exception) {
-    const loggingEvent = new LogEvent(this.category, logLevel, message,
-      exception, this);
+  // '...args' can be any number of arguments of any type
+  log(logLevel, ...args) {
+    const loggingEvent = new LogEvent(this.category, logLevel, ...args);
 
     this.appenders.forEach(appender => appender.doAppend(loggingEvent));
   }
@@ -74,16 +73,16 @@ class Logger {
   }
 
   // Helper method to log a message if the level is enabled
-  logIfEnabled(logLevel, message, exception) {
+  logIfEnabled(logLevel, ...args) {
     if (this.isLevelEnabled(logLevel)) {
-      this.log(logLevel, message, exception);
+      this.log(logLevel, ...args);
     }
   }
 }
 
 // Set helper function prototypes
-loggingMethods.forEach(levelStr => Logger.prototype[levelStr] = function log(message, throwable) {
-  this.logIfEnabled(Level.toLevel(levelStr), message, throwable);
+loggingMethods.forEach(levelStr => Logger.prototype[levelStr] = function log(...args) {
+  this.logIfEnabled(Level.toLevel(levelStr), ...args);
 });
 
 export default Logger;

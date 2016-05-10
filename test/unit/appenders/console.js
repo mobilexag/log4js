@@ -3,16 +3,14 @@
 
 import { expect } from 'chai';
 import ConsoleAppender from '../../../src/appenders/console';
-import { SIMPLE_LOG_FORMAT } from '../../../src/date-formatter';
 import LogLevel from '../../../src/log-level';
 import { getLogger } from '../../../src/index';
 import LogEvent from '../../../src/log-event';
-import SimpleLayout from '../../../src/layouts/simple';
+import ArrayLayout from '../../../src/layouts/array';
 import { assert, sandbox as Sandbox } from 'sinon';
 
 describe('Console Appender', () => {
   let sandbox;
-  const simpleLogDateRegex = /\d\d\d\d\.\d\d\.\d\d-\d\d:\d\d:\d\d/;
 
   beforeEach(() => {
     sandbox = Sandbox.create();
@@ -34,7 +32,6 @@ describe('Console Appender', () => {
     const appender = ConsoleAppender.getInstance();
     expect(appender).to.be.ok;
 
-    appender.setLayout(new SimpleLayout());
     logger.addAppender(appender);
   });
 
@@ -48,9 +45,8 @@ describe('Console Appender', () => {
   it('debug logging', () => {
     const logger = getLogger('debug');
     const debug = 'My debug message';
-    const formattedMessage = new SimpleLayout().format(
+    const formattedMessage = new ArrayLayout().format(
       new LogEvent('debug', LogLevel.DEBUG, debug, undefined, logger));
-    const formattedMessageWithoutDate = formattedMessage.substring(SIMPLE_LOG_FORMAT.length);
 
     logger.setLevel(LogLevel.DEBUG);
     logger.addAppender(ConsoleAppender.getInstance());
@@ -63,13 +59,10 @@ describe('Console Appender', () => {
     assert.calledOnce(console.log);
 
     const logCall = console.log.getCall(0);
-    const logMessage = logCall.args[0];
 
-    const logDate = logMessage.substring(0, SIMPLE_LOG_FORMAT.length);
-    const logRest = logMessage.substring(SIMPLE_LOG_FORMAT.length);
-
-    expect(logDate).to.match(simpleLogDateRegex);
-    expect(logRest).to.equal(formattedMessageWithoutDate);
+    logCall.args.forEach((argument, index) => {
+      expect(argument).to.equal(formattedMessage[index]);
+    });
   });
 
   it('debug not logging when level not low enough', () => {
@@ -90,9 +83,8 @@ describe('Console Appender', () => {
   it('info logging', () => {
     const logger = getLogger('info');
     const info = 'What an info!';
-    const formattedMessage = new SimpleLayout().format(
+    const formattedMessage = new ArrayLayout().format(
       new LogEvent('info', LogLevel.INFO, info, undefined, logger));
-    const formattedMessageWithoutDate = formattedMessage.substring(SIMPLE_LOG_FORMAT.length);
 
     logger.setLevel(LogLevel.INFO);
     logger.addAppender(ConsoleAppender.getInstance());
@@ -105,13 +97,10 @@ describe('Console Appender', () => {
     assert.notCalled(console.log);
 
     const logCall = console.info.getCall(0);
-    const logMessage = logCall.args[0];
 
-    const logDate = logMessage.substring(0, SIMPLE_LOG_FORMAT.length);
-    const logRest = logMessage.substring(SIMPLE_LOG_FORMAT.length);
-
-    expect(logDate).to.match(simpleLogDateRegex);
-    expect(logRest).to.equal(formattedMessageWithoutDate);
+    logCall.args.forEach((argument, index) => {
+      expect(argument).to.equal(formattedMessage[index]);
+    });
   });
 
   it('info not logging when level not low enough', () => {
@@ -132,9 +121,8 @@ describe('Console Appender', () => {
   it('warning logging', () => {
     const logger = getLogger('warning');
     const warning = 'What a warning!';
-    const formattedMessage = new SimpleLayout().format(
+    const formattedMessage = new ArrayLayout().format(
       new LogEvent('warning', LogLevel.WARN, warning, undefined, logger));
-    const formattedMessageWithoutDate = formattedMessage.substring(SIMPLE_LOG_FORMAT.length);
 
     logger.setLevel(LogLevel.WARN);
     logger.addAppender(ConsoleAppender.getInstance());
@@ -149,11 +137,9 @@ describe('Console Appender', () => {
     const logCall = console.warn.getCall(0);
     const logMessage = logCall.args[0];
 
-    const logDate = logMessage.substring(0, SIMPLE_LOG_FORMAT.length);
-    const logRest = logMessage.substring(SIMPLE_LOG_FORMAT.length);
-
-    expect(logDate).to.match(simpleLogDateRegex);
-    expect(logRest).to.equal(formattedMessageWithoutDate);
+    logCall.args.forEach((argument, index) => {
+      expect(argument).to.equal(formattedMessage[index]);
+    });
   });
 
   it('warning not logging when level not low enough', () => {
@@ -174,9 +160,8 @@ describe('Console Appender', () => {
   it('error logging', () => {
     const logger = getLogger('error');
     const error = 'Something went horribly wrong!';
-    const formattedMessage = new SimpleLayout().format(
+    const formattedMessage = new ArrayLayout().format(
       new LogEvent('error', LogLevel.ERROR, error, undefined, logger));
-    const formattedMessageWithoutDate = formattedMessage.substring(SIMPLE_LOG_FORMAT.length);
 
     logger.setLevel(LogLevel.ERROR);
     logger.addAppender(ConsoleAppender.getInstance());
@@ -189,13 +174,10 @@ describe('Console Appender', () => {
     assert.notCalled(console.log);
 
     const logCall = console.error.getCall(0);
-    const logMessage = logCall.args[0];
 
-    const logDate = logMessage.substring(0, SIMPLE_LOG_FORMAT.length);
-    const logRest = logMessage.substring(SIMPLE_LOG_FORMAT.length);
-
-    expect(logDate).to.match(simpleLogDateRegex);
-    expect(logRest).to.equal(formattedMessageWithoutDate);
+    logCall.args.forEach((argument, index) => {
+      expect(argument).to.equal(formattedMessage[index]);
+    });
   });
 
   it('error not logging when level not low enough', () => {
