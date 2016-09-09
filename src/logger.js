@@ -1,5 +1,6 @@
 // Logger to log messages to the defined appenders.
 // Use setAppender() to set a specific appender (e.g. ConsoleAppender).
+
 import Appender from './appender';
 import Level from './log-level';
 import LogEvent from './log-event';
@@ -57,8 +58,8 @@ class Logger {
   // 'logLevel' is of the type 'Level'
   // 'message' is of the type 'string'
   // '...args' can be any number of arguments of any type
-  log(logLevel, ...args) {
-    const loggingEvent = new LogEvent(this.category, logLevel, ...args);
+  log(logLevel, args) {
+    const loggingEvent = new LogEvent(this.category, logLevel, args);
 
     this.appenders.forEach(appender => appender.doAppend(loggingEvent));
   }
@@ -73,16 +74,16 @@ class Logger {
   }
 
   // Helper method to log a message if the level is enabled
-  logIfEnabled(logLevel, ...args) {
+  logIfEnabled(logLevel, args) {
     if (this.isLevelEnabled(logLevel)) {
-      this.log(logLevel, ...args);
+      this.log(logLevel, args);
     }
   }
 }
 
 // Set helper function prototypes
 loggingMethods.forEach(levelStr => Logger.prototype[levelStr] = function log(...args) {
-  this.logIfEnabled(Level.toLevel(levelStr), ...args);
+  this.logIfEnabled(Level.toLevel(levelStr), args);
 });
 
 export default Logger;
