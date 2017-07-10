@@ -50,3 +50,13 @@ export function listenToWindowErrors(logger) {
     console.error('Could not listen add event listener to window.onerror'); // eslint-disable-line
   }
 }
+
+export { default as Appender } from './appender';
+export { default as ConsoleAppender } from './appenders/console';
+export * from './date-formatter';
+export { default as Layout } from './layout';
+export { default as Array } from './layouts/array';
+export { default as Simple } from './layouts/simple';
+export { default as LogEvent } from './log-event';
+export { default as LogLevel } from './log-level';
+export { default as Logger } from './logger';
